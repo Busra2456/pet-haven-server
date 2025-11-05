@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express();
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion} = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
  
@@ -30,27 +30,45 @@ async function run() {
     const usersCollection = client.db("PetHaven").collection("users")
 
       const reviewsCollection = client.db("PetHaven").collection("reviews")
+// const dogsCollection = client.db("PetHaven").collection("dogs")
+ const dogCartsCollection = client.db("PetHaven").collection("carts")
 
 
-
-
-    app.get("/users", async(req,res) =>{
+      app.get("/users", async(req,res) =>{
       const result = await usersCollection.find().toArray();
       res.send(result)
     })
 
-    
-
-
-    app.get("/reviews", async(req,res) =>{
-      const result = await reviewsCollection.find().toArray();
-      res.send(result)
+    //Reviews collection
+ 
+        app.get("/reviews", async(req,res) =>{
+       
+        const result = await reviewsCollection.find().toArray();
+        res.send(result)
     })
 
-     
- 
+       app.post('/reviews', async (req, res) => {
+       const review = req.body; 
+       const result = await reviewsCollection.insertOne(review);
+       res.send(result);
+    });
 
 
+     //cards collection
+      app.get('/carts',async(req,res)=>{
+        const email = req.query.email;
+        const query ={email:email};
+        const result = await dogCartsCollection.find(query).toArray();
+        res.send(result);
+
+      })
+
+       app.post('/carts', async(req,res)=>{
+        const cartItem = req.body;
+        const result = await dogCartsCollection.insertOne(cartItem);
+        res.send(result);
+
+      })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
